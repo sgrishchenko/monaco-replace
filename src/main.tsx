@@ -14,7 +14,8 @@ import 'monaco-editor/esm/vs/language/typescript/monaco.contribution'
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import {languages, type Environment} from 'monaco-editor/esm/vs/editor/editor.api';
 
-import { createHighlighter } from 'shiki'
+import { createBundledHighlighter } from 'shiki/core'
+import { createOnigurumaEngine } from 'shiki/engine/oniguruma'
 import { shikiToMonaco } from '@shikijs/monaco'
 
 import './index.css'
@@ -44,6 +45,18 @@ languages.typescript.typescriptDefaults.setEagerModelSync(true);
 languages.typescript.typescriptDefaults.setModeConfiguration({
     ...languages.typescript.typescriptDefaults.modeConfiguration,
     completionItems: false,
+});
+
+const createHighlighter = createBundledHighlighter({
+    langs: 	{
+        "python": () => import("shiki/langs/python.mjs"),
+        "typescript": () => import("shiki/langs/typescript.mjs"),
+    },
+    themes: {
+        "github-dark-default": import("shiki/themes/github-dark-default.mjs"),
+        "github-light-default": import("shiki/themes/github-light-default.mjs"),
+    },
+    engine: () => createOnigurumaEngine(import("shiki/wasm"))
 });
 
 const highlighter = await createHighlighter({
